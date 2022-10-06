@@ -10,66 +10,49 @@ import {
 import { CreateUserDTO, EditUserDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
-interface UserResponse<T = unknown> {
-  code: number;
-  data?: T;
-  message: string;
-}
+// interface UserResponse<T = unknown> {
+//   code: number;
+//   data?: T;
+//   message: string;
+// }
 
+@ApiTags('用户')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   // GET /user/users
+  @ApiOperation({ summary: '获取所有用户' })
   @Get('users')
-  async findAll(): Promise<UserResponse<User[]>> {
-    return {
-      code: 200,
-      data: await this.userService.findAll(),
-      message: 'Success.',
-    };
+  async findAll(): Promise<User[]> {
+    return await this.userService.findAll();
   }
-
   // GET /user/:_id
+  @ApiOperation({ summary: '根据Id查询用户' })
   @Get(':_id')
-  async findOne(@Param('_id') _id: string): Promise<UserResponse<User>> {
-    return {
-      code: 200,
-      data: await this.userService.findOne(_id),
-      message: 'Success.',
-    };
+  async findOne(@Param('_id') _id: string): Promise<User> {
+    return await this.userService.findOne(_id);
   }
 
   // POST /user
+  @ApiOperation({ summary: '添加用户' })
   @Post()
-  async addOne(@Body() body: CreateUserDTO): Promise<UserResponse> {
-    await this.userService.addOne(body);
-    return {
-      code: 200,
-      message: 'Success.',
-    };
+  async addOne(@Body() body: CreateUserDTO) {
+    return await this.userService.addOne(body);
   }
 
   // PUT /user/:_id
+  @ApiOperation({ summary: '更新用户' })
   @Put(':_id')
-  async editOne(
-    @Param('_id') _id: string,
-    @Body() body: EditUserDTO,
-  ): Promise<UserResponse> {
-    await this.userService.editOne(_id, body);
-    return {
-      code: 200,
-      message: 'Success.',
-    };
+  async editOne(@Param('_id') _id: string, @Body() body: EditUserDTO) {
+    return await this.userService.editOne(_id, body);
   }
 
   // DELETE /user/:_id
+  @ApiOperation({ summary: '删除用户' })
   @Delete(':_id')
-  async deleteOne(@Param('_id') _id: string): Promise<UserResponse> {
-    await this.userService.deleteOne(_id);
-    return {
-      code: 200,
-      message: 'Success.',
-    };
+  async deleteOne(@Param('_id') _id: string) {
+    return await this.userService.deleteOne(_id);
   }
 }

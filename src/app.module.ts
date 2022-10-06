@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './server/user/user.module';
 import { PostsModule } from './server/posts/posts.module';
-import { PostsService } from './posts/posts.service';
+import { PostsService } from './server/posts/posts.service';
 
 @Module({
   imports: [MongooseModule.forRoot('mongodb://localhost/nestdemo'),UserModule, PostsModule],

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
@@ -17,24 +17,42 @@ export class UserService {
     const users = await this.userModel.find();
     return users;
   }
- 
+
   // 查找单个用户
   async findOne(_id: string): Promise<User> {
     return await this.userModel.findById(_id);
   }
- 
+
   // 添加单个用户
   async addOne(body: CreateUserDTO): Promise<void> {
+    const { _id } = body;
+    if (!_id) {
+      throw new HttpException('缺少用户id', 401);
+    }
+    const user = await this.userModel.findById(_id);
+    if (user) {
+      throw new HttpException('用户已存在', 401);
+    }
     await this.userModel.create(body);
   }
- 
+
   // 编辑单个用户
   async editOne(_id: string, body: EditUserDTO): Promise<void> {
+    const existUser = await this.userModel.findById(_id);
+
+    if (!existUser) {
+      throw new HttpException(`id为${_id}的用户不存在`, 401);
+    }
     await this.userModel.findByIdAndUpdate(_id, body);
   }
- 
+
   // 删除单个用户
   async deleteOne(_id: string): Promise<void> {
+    const existUser = await this.userModel.findById(_id);
+
+    if (!existUser) {
+      throw new HttpException(`id为${_id}的用户不存在`, 401);
+    }
     await this.userModel.findByIdAndDelete(_id);
   }
 }
