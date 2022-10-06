@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './core/filter/http-exception.filter';
 import { TransformInterceptor } from './core/interceptor/transform.interceptor';
+import { ValidationPipe } from './pipe/validation.pipe'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -18,9 +19,12 @@ async function bootstrap() {
   
   // 注册全局错误的过滤器
   app.useGlobalFilters(new HttpExceptionFilter());
-  
+
   // 全局注册拦截器
   app.useGlobalInterceptors(new TransformInterceptor())
+
+  // 全局注册管道ValidationPipe
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 bootstrap();

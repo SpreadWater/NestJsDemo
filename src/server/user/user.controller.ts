@@ -6,12 +6,13 @@ import {
   Param,
   Post,
   Put,
+  UsePipes 
 } from '@nestjs/common';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-
+import { ValidationPipe } from '../../pipe/validation.pipe';
 // interface UserResponse<T = unknown> {
 //   code: number;
 //   data?: T;
@@ -37,6 +38,7 @@ export class UserController {
 
   // POST /user
   @ApiOperation({ summary: '添加用户' })
+  @UsePipes(new ValidationPipe())
   @Post()
   async addOne(@Body() body: CreateUserDTO) {
     return await this.userService.addOne(body);
