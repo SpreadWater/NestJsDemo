@@ -6,12 +6,12 @@ import {
   Param,
   Post,
   Put,
-  UsePipes 
+  UsePipes
 } from '@nestjs/common';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
 import { User } from './user.interface';
 import { UserService } from './user.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ValidationPipe } from '../../pipe/validation.pipe';
 // interface UserResponse<T = unknown> {
 //   code: number;
@@ -23,6 +23,13 @@ import { ValidationPipe } from '../../pipe/validation.pipe';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // 注册用户
+  @ApiOperation({ summary: '注册用户' })
+  @Post('register')
+  register(@Body() createUser: CreateUserDTO) {
+    return this.userService.register(createUser);
+  }
   // GET /user/users
   @ApiOperation({ summary: '获取所有用户' })
   @Get('users')

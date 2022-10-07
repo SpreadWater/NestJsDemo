@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable,HttpStatus  } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateUserDTO, EditUserDTO } from './user.dto';
@@ -11,6 +11,19 @@ import { User } from './user.interface';
 @Injectable()
 export class UserService {
   constructor(@InjectModel('Users') private readonly userModel: Model<User>) {}
+
+  // 注册用户
+  async register(createUser: CreateUserDTO) {
+    const { user_name } = createUser;
+    const existUser = await this.userModel.findOne({
+      user_name: user_name,
+    });
+    if (existUser) {
+      throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
+    }
+    await this.userModel.create(createUser);
+    return await this.userModel.findOne({user_name:user_name},{_id:0,password:0});
+  }
 
   // 查找所有用户
   async findAll(): Promise<User[]> {
@@ -27,11 +40,11 @@ export class UserService {
   async addOne(body: CreateUserDTO): Promise<void> {
     const { _id } = body;
     if (!_id) {
-      throw new HttpException('缺少用户id', 401);
+      throw new HttpException('缺少用户id', HttpStatus.BAD_REQUEST);
     }
     const user = await this.userModel.findById(_id);
     if (user) {
-      throw new HttpException('用户已存在', 401);
+      throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
     }
     await this.userModel.create(body);
   }
@@ -41,7 +54,7 @@ export class UserService {
     const existUser = await this.userModel.findById(_id);
 
     if (!existUser) {
-      throw new HttpException(`id为${_id}的用户不存在`, 401);
+      throw new HttpException(`id为${_id}的用户不存在`, HttpStatus.BAD_REQUEST);
     }
     await this.userModel.findByIdAndUpdate(_id, body);
   }
@@ -51,7 +64,7 @@ export class UserService {
     const existUser = await this.userModel.findById(_id);
 
     if (!existUser) {
-      throw new HttpException(`id为${_id}的用户不存在`, 401);
+      throw new HttpException(`id为${_id}的用户不存在`, HttpStatus.BAD_REQUEST);
     }
     await this.userModel.findByIdAndDelete(_id);
   }
